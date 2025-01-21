@@ -35,6 +35,7 @@ export const boardItem = style({
   padding: vars.spacing.medium,
   borderRadius: 10,
   cursor: 'pointer',
+  marginRight: vars.spacing.big1,
   ':hover': {
     opacity: 0.8,
     transform: 'scale(1.03)',
