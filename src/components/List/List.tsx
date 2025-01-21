@@ -65,7 +65,7 @@ const List: React.FC<TListProps> = ({ list, boardId }) => {
           />
         </div>
       ))}
-      <ActionButton />
+      <ActionButton boardId={boardId} listId={list.listId} />
     </div>
   );
 };
