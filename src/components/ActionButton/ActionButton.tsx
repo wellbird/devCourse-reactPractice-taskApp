@@ -25,7 +25,10 @@ const ActionButton: React.FC<TActionButtonProps> = ({
       listId={listId}
     />
   ) : (
-    <div className={list ? listButton : taskButton}>
+    <div
+      className={list ? listButton : taskButton}
+      onClick={() => setIsFormOpen(true)}
+    >
       <IoIosAdd />
       <p>{buttonText}</p>
     </div>
