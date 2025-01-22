@@ -26,6 +26,12 @@ type TAddTaskAction = {
   task: ITask;
 };
 
+type TDeleteTaskAction = {
+  boardId: string;
+  listId: string;
+  taskId: string;
+};
+
 const initialState: TBoardsState = {
   modalActive: false,
   boardArray: [
@@ -96,6 +102,46 @@ const boardSlice = createSlice({
           : board
       );
     },
+    updateTask: (state, { payload }: PayloadAction<TAddTaskAction>) => {
+      state.boardArray = state.boardArray.map((board) =>
+        board.boardId === payload.boardId
+          ? {
+              ...board,
+              lists: board.lists.map((list) =>
+                list.listId === payload.listId
+                  ? {
+                      ...list,
+                      tasks: list.tasks.map((task) =>
+                        task.taskId === payload.task.taskId
+                          ? payload.task
+                          : task
+                      ),
+                    }
+                  : list
+              ),
+            }
+          : board
+      );
+    },
+    deleteTask: (state, { payload }: PayloadAction<TDeleteTaskAction>) => {
+      state.boardArray = state.boardArray.map((board) =>
+        board.boardId === payload.boardId
+          ? {
+              ...board,
+              lists: board.lists.map((list) =>
+                list.listId === payload.listId
+                  ? {
+                      ...list,
+                      tasks: list.tasks.filter(
+                        (task) => task.taskId !== payload.taskId
+                      ),
+                    }
+                  : list
+              ),
+            }
+          : board
+      );
+    },
     deleteList: (state, { payload }: PayloadAction<TDeleteListAction>) => {
       state.boardArray = state.boardArray.map((board) =>
         board.boardId === payload.boardId
@@ -114,6 +160,13 @@ const boardSlice = createSlice({
   },
 });
 
-export const { addBoard, addList, addTask, deleteList, setModalActive } =
-  boardSlice.actions;
+export const {
+  addBoard,
+  addList,
+  addTask,
+  updateTask,
+  deleteTask,
+  deleteList,
+  setModalActive,
+} = boardSlice.actions;
 export const boardsReducer = boardSlice.reducer;
