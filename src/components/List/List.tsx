@@ -31,12 +31,7 @@ const List: React.FC<TListProps> = ({ list, boardId }) => {
     );
   };
 
-  const handleTaskChange = (
-    boardId: string,
-    listId: string,
-    taskId: string,
-    task: ITask
-  ) => {
+  const handleTaskChange = (boardId: string, listId: string, task: ITask) => {
     dispatch(setModalData({ boardId, listId, task }));
     dispatch(setModalActive(true));
   };
@@ -59,14 +54,11 @@ const List: React.FC<TListProps> = ({ list, boardId }) => {
           {list.tasks.map((task, index) => (
             <div
               key={task.taskId}
-              onClick={
-                () => handleTaskChange(boardId, list.listId, task.taskId, task) // 이부분은 task를 넣어줄껀데 task.taskId를 따로 넣는 이유가 뭐지? 나중에 테스트
-              }
+              onClick={() => handleTaskChange(boardId, list.listId, task)}
             >
               <Task
                 taskName={task.taskName}
                 taskDescription={task.taskDescription}
-                boardId={boardId}
                 id={task.taskId}
                 index={index}
               />
