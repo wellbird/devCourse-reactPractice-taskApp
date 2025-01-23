@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
 import {
   appContainer,
   board,
@@ -11,7 +12,7 @@ import ListsContainer from './components/ListsContainer/ListsContainer';
 import { useTypedDispatch, useTypedSelector } from './hooks/redux';
 import EditModal from './components/EditModal/EditModal';
 import LoggerModal from './components/LoggerModal/LoggerModal';
-import { deleteBoard } from './store/slices/boardsSlice';
+import { deleteBoard, sort } from './store/slices/boardsSlice';
 import { addLog } from './store/slices/loggerSlice';
 import { v4 } from 'uuid';
 
@@ -51,6 +52,41 @@ function App() {
     }
   };
 
+  const handleDragEnd = (result: any) => {
+    const { destination, source, draggableId } = result;
+    const sourceList = lists.filter(
+      (list) => list.listId === source.droppableId
+    )[0];
+
+    dispatch(
+      sort({
+        boardIndex: boards.findIndex(
+          (board) => board.boardId === activeBoardId
+        ),
+        droppableIdStart: source.droppableId,
+        droppableIdEnd: destination.droppableId,
+        droppableIndexStart: source.index,
+        droppableIndexEnd: destination.index,
+        draggableId,
+      })
+    );
+
+    dispatch(
+      addLog({
+        logId: v4(),
+        logMessage: `리스트 "${sourceList.listName}"을 리스트"${
+          lists.filter((list) => list.listId === destination.droppableId)[0]
+            .listName
+        }"으로 ${
+          sourceList.tasks.filter((task) => task.taskId === draggableId)[0]
+            .taskName
+        }을 옮김`,
+        logAuthor: 'user',
+        logTimestamp: String(Date.now()), // 로그에 타임스탬프 넣어줄 때 string으로 굳이 변환해서 넣는 이유 알아보기. 로그에서 쓸 때 number로 변환하던데
+      })
+    );
+  };
+
   return (
     <div className={appContainer}>
       {isLoggerOpen ? <LoggerModal setIsLoggerOpen={setIsLoggerOpen} /> : null}
@@ -61,8 +97,10 @@ function App() {
         setActiveBoardId={setActiveBoardId}
       />
       <div className={board}>
-        <ListsContainer lists={lists} boardId={getActiveBoard.boardId} />
-        {/**이 부분도 현재 상태에 있는 activeBoardId가 더 명확할 것 같은데 왜 이렇게 했는지 나중에 테스트 */}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <ListsContainer lists={lists} boardId={getActiveBoard.boardId} />
+          {/**이 부분도 현재 상태에 있는 activeBoardId가 더 명확할 것 같은데 왜 이렇게 했는지 나중에 테스트 */}
+        </DragDropContext>
       </div>
       <div className={buttons}>
         <button className={deleteBoardButton} onClick={handleDeleteBoard}>
